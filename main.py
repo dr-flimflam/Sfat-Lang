@@ -8,6 +8,14 @@ program_filepath = sys.argv[1]
 program_lines = []
 program_file = codecs.open(program_filepath, "r", "utf-8")
 program_lines  = [line.strip() for line in program_file.readlines()]
+to_remove = []
+for line in program_lines:
+    if line != "":    
+        if line[0] == "#":
+            to_remove.append(line)
+for i in to_remove:
+    program_lines.remove(i)
+
 
 class Stack:
     
