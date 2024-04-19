@@ -47,7 +47,6 @@ program_lines.pop(0)
 if first_line[1] == "0": debug = False
 elif first_line[1] == "1": debug = True
 elif first_line[1] == "2": debug = int(input("מצב ניקוי תקלות?"))
-debug = int(first_line[0])
 stack = Stack(int(first_line[0]))
 for line in program_lines:
     parts = line.split(" ")
