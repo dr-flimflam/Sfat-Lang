@@ -48,6 +48,8 @@ if first_line[1] == "0": debug = False
 elif first_line[1] == "1": debug = True
 elif first_line[1] == "2": debug = int(input("מצב ניקוי תקלות?"))
 stack = Stack(int(first_line[0]))
+if first_line[2] == "0": fixstr = False
+if first_line[2] == "1": fixstr = True
 for line in program_lines:
     parts = line.split(" ")
     opcode = parts[0]
@@ -79,6 +81,8 @@ for line in program_lines:
     elif opcode == "הדפס":
         if parts[1].startswith("\"") or parts[1].startswith("\'"):
             string_literal = ' '.join(parts[1:])[1:-1]
+            if fixstr:
+                string_literal = string_literal[::-1]
             program.append(string_literal)
         else:
             match parts[1]:
@@ -90,15 +94,15 @@ for line in program_lines:
                     func = stack.spf
             program.append(func)
         token_counter += 1
-    elif opcode == "שווה":
+    elif opcode == "שווה" or opcode == "-שווה":
         label = parts[1]
         program.append(label)
         token_counter += 1
-    elif opcode == "גדול":
+    elif opcode == "גדול" or opcode == "-גדול":
         label = parts[1]
         program.append(label)
         token_counter += 1
-    elif opcode == "קפוץ":
+    elif opcode == "קפוץ" or opcode == "-קפוץ":
         label = parts[1]
         program.append(label)
         token_counter += 1
@@ -175,7 +179,7 @@ while program[pc] != "עצור":
         if i == '': break
         number = int(i)
         stack.push(number)
-    elif opcode == "שווה":
+    elif opcode == "-שווה":
         number = stack.top()
         if debug: print(program[pc])
         if number == 0:
@@ -183,7 +187,10 @@ while program[pc] != "עצור":
             pc = label_tracker[program[pc]]
         else:
             pc += 1
-    elif opcode == "גדול":
+    elif opcode == "-":
+        last_goto = pc
+            
+    elif opcode == "-גדול":
         number = stack.top()
         if debug: print(program[pc])
         if number > 0:
@@ -191,10 +198,28 @@ while program[pc] != "עצור":
             pc = label_tracker[program[pc]]
         else:
             pc += 1
-    elif opcode == "קפוץ":
+    elif opcode == "-קפוץ":
         number = stack.top()    
         if debug: print(program[pc])
         last_goto = pc+1
+        pc = label_tracker[program[pc]]
+    elif opcode == "שווה":
+        number = stack.top()
+        if debug: print(program[pc])
+        if number == 0:
+            pc = label_tracker[program[pc]]
+        else:
+            pc += 1
+    elif opcode == "גדול":
+        number = stack.top()
+        if debug: print(program[pc])
+        if number > 0:
+            pc = label_tracker[program[pc]]
+        else:
+            pc += 1
+    elif opcode == "קפוץ":
+        number = stack.top()    
+        if debug: print(program[pc])
         pc = label_tracker[program[pc]]
     elif opcode == "החלף":
         i = stack.pop()
